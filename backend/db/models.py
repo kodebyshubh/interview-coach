@@ -1,0 +1,67 @@
+import uuid
+from datetime import datetime
+
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class Session(Base):
+    __tablename__ = "sessions"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    role: Mapped[str] = mapped_column(String)
+    jd_summary: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String, default="active")
+
+    questions: Mapped[list["Question"]] = relationship(
+        back_populates="session", cascade="all, delete-orphan"
+    )
+
+
+class Question(Base):
+    __tablename__ = "questions"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("sessions.id")
+    )
+    text: Mapped[str] = mapped_column(Text)
+    order_index: Mapped[int] = mapped_column(Integer)
+    source: Mapped[str] = mapped_column(String)
+
+    session: Mapped["Session"] = relationship(back_populates="questions")
+    answers: Mapped[list["Answer"]] = relationship(
+        back_populates="question", cascade="all, delete-orphan"
+    )
+
+
+class Answer(Base):
+    __tablename__ = "answers"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    question_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("questions.id")
+    )
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("sessions.id")
+    )
+    text: Mapped[str] = mapped_column(Text)
+    score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
+    weak_topics: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
+    is_probe: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+    question: Mapped["Question"] = relationship(back_populates="answers")

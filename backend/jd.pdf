@@ -1,0 +1,18 @@
+%PDF-1.1
+1 0 obj <</Type/Catalog/Pages 2 0 R>> endobj
+2 0 obj <</Type/Pages/Kids [3 0 R]/Count 1>> endobj
+3 0 obj <</Type/Page/Parent 2 0 R/MediaBox [0 0 600 800]/Resources <</Font <</F1 <</Type/Font/Subtype/Type1/BaseFont/Helvetica>>>>>>/Contents 4 0 R>> endobj
+4 0 obj <</Length 200>> stream
+BT /F1 12 Tf 50 700 Td (This document is long enough to have more than one hundred characters. Indeed, we need to ensure the processing logic can successfully chunk this text into vector database records.) Tj ET
+endstream endobj
+xref
+0 5
+0000000000 65535 f
+0000000009 00000 n
+0000000052 00000 n
+0000000101 00000 n
+0000000215 00000 n
+trailer <</Size 5/Root 1 0 R>>
+startxref
+300
+%%EOF

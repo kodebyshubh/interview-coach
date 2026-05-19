@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+sqlalchemy
+asyncpg
+psycopg2-binary
+chromadb
+google-generativeai
+groq
+pypdf2
+python-multipart
+pydantic
