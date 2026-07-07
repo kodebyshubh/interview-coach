@@ -17,6 +17,40 @@ services:
     volumes:
       - chromadb_data:/chroma/chroma
 
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      # Overrides for backend/.env — these must use in-network service names/ports,
+      # not the host-facing values (localhost / 5433 / 8001) used for local dev.
+      DATABASE_URL: postgresql://coach:coach@postgres:5432/interviewdb
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: "8000"
+      # Ollama runs on the host, not as a compose service — host.docker.internal is
+      # Docker Desktop's bridge back to the host machine. extra_hosts below makes
+      # this resolve on Linux hosts too (Docker Desktop on Win/Mac supports it natively).
+      OLLAMA_HOST: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - postgres
+      - chromadb
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Baked into the client bundle at build time — must be the browser-reachable
+        # (host-published) backend URL, not the in-network service name.
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
   chromadb_data:

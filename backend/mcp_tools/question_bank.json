@@ -1,0 +1,44 @@
+[
+  {
+    "roles": ["Backend Engineer", "Software Engineer"],
+    "question_type": "behavioral",
+    "question": "Tell me about a time you had to debug a production issue under time pressure. What was your process?",
+    "expected_themes": ["debugging", "incident response", "communication"],
+    "difficulty": "medium"
+  },
+  {
+    "roles": ["Backend Engineer", "Software Engineer"],
+    "question_type": "technical",
+    "question": "How would you design a rate limiter for a public REST API?",
+    "expected_themes": ["system design", "API design", "concurrency"],
+    "difficulty": "medium"
+  },
+  {
+    "roles": ["Backend Engineer", "Software Engineer"],
+    "question_type": "situational",
+    "question": "A critical database migration is halfway done in production and you notice it's corrupting data. What do you do?",
+    "expected_themes": ["incident response", "database", "risk management"],
+    "difficulty": "hard"
+  },
+  {
+    "roles": ["Frontend Engineer"],
+    "question_type": "behavioral",
+    "question": "Tell me about a time you had to push back on a design that wasn't technically feasible. How did you handle it?",
+    "expected_themes": ["communication", "design collaboration", "trade-offs"],
+    "difficulty": "medium"
+  },
+  {
+    "roles": ["Frontend Engineer"],
+    "question_type": "technical",
+    "question": "How would you optimize the initial load time of a large single-page application?",
+    "expected_themes": ["performance", "bundling", "rendering strategy"],
+    "difficulty": "medium"
+  },
+  {
+    "roles": ["Data Engineer"],
+    "question_type": "technical",
+    "question": "How would you design a pipeline to deduplicate records arriving from multiple upstream sources?",
+    "expected_themes": ["data pipelines", "deduplication", "idempotency"],
+    "difficulty": "medium"
+  }
+]

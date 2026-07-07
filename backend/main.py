@@ -2,14 +2,20 @@ from contextlib import asynccontextmanager
 import uuid
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from agents.evaluator import ollama_client
 from db.database import get_db
 from db.init_db import init_db
 from db.models import Session
 from rag.embedder import embed_jd, embed_resume
 from rag.retriever import retrieve_jd_context, retrieve_resume_context
+from routes.analytics import router as analytics_router
+from routes.answers import router as answers_router
+from routes.questions import router as questions_router
+from routes.summary import router as summary_router
 from schemas import RetrievalTestRequest, RetrievalTestResponse, UploadResponse
 from utils.pdf_parser import extract_text_from_pdf
 
@@ -21,6 +27,18 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(questions_router, prefix="/api")
+app.include_router(answers_router, prefix="/api")
+app.include_router(summary_router, prefix="/api")
+app.include_router(analytics_router, prefix="/api")
 
 
 @app.get("/health")
@@ -35,6 +53,15 @@ async def health_db(db: AsyncSession = Depends(get_db)):
         return {"db": "ok"}
     except Exception as e:
         return {"db": "error", "detail": str(e)}
+
+
+@app.get("/health/llm")
+async def health_llm():
+    try:
+        ollama_client.list()
+        return {"llm": "ok"}
+    except Exception as e:
+        return {"llm": "error", "detail": str(e)}
 
 
 @app.post("/upload", response_model=UploadResponse)

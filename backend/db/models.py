@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -36,6 +36,9 @@ class Question(Base):
         UUID(as_uuid=True), ForeignKey("sessions.id")
     )
     text: Mapped[str] = mapped_column(Text)
+    question_type: Mapped[str] = mapped_column(String)
+    difficulty: Mapped[str | None] = mapped_column(String, nullable=True)
+    expected_themes: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     order_index: Mapped[int] = mapped_column(Integer)
     source: Mapped[str] = mapped_column(String)
 
@@ -60,8 +63,30 @@ class Answer(Base):
     text: Mapped[str] = mapped_column(Text)
     score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
-    weak_topics: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
+    weak_topics: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     is_probe: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     question: Mapped["Question"] = relationship(back_populates="answers")
+
+
+class EvalLog(Base):
+    """One row per LLM call made through a graph node (question gen, probe, eval, summary)."""
+
+    __tablename__ = "eval_logs"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("sessions.id")
+    )
+    question_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("questions.id"), nullable=True
+    )
+    question_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    answer_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    latency_ms: Mapped[int] = mapped_column(Integer)
+    model_used: Mapped[str] = mapped_column(String)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
